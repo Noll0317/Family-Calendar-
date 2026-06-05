@@ -1,33 +1,20 @@
-# Family Command Center
+create table if not exists public.events (
+  id uuid primary key default gen_random_uuid(),
+  person text not null check (person in ('Chris','Sam','Taylor','Aiden','Family')),
+  title text not null,
+  date date not null,
+  start_time time,
+  end_time time,
+  location text,
+  notes text,
+  created_at timestamptz default now()
+);
 
-A phone-friendly shared weekly calendar for Chris, Sam, Taylor, and Aiden.
+alter table public.events enable row level security;
 
-## People colors
-- Chris: red
-- Sam: orange
-- Taylor: purple
-- Aiden: green
-
-## Run locally
-```bash
-npm install
-npm run dev
-```
-
-## Deploy to Netlify
-1. Create a GitHub repo and upload these files.
-2. In Netlify, choose Add new site -> Import from Git.
-3. Build command: `npm run build`
-4. Publish directory: `dist`
-5. Add environment variables:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-
-## Supabase setup
-1. Create a free Supabase project.
-2. Go to SQL Editor.
-3. Paste and run `supabase-schema.sql`.
-4. Copy your Project URL and anon public key into Netlify environment variables.
-5. Redeploy Netlify.
-
-Without Supabase, the app runs in demo mode using local browser storage only.
+-- Simple family app policy. Anyone with your anon key can read/write.
+-- Keep the app link private. Later we can add real logins.
+create policy "family can read events" on public.events for select using (true);
+create policy "family can add events" on public.events for insert with check (true);
+create policy "family can update events" on public.events for update using (true);
+create policy "family can delete events" on public.events for delete using (true);
